@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  fukuoka-childrens-hospital-dev
+
+Parameters:
+  SecretsManagerSecretId:
+    Type: String
+    Default: yachin-dev
+
+Globals:
+  Function:
+    Timeout: 3
+    Environment:
+      Variables:
+        DEPLOY_ENV: !Ref SecretsManagerSecretId
+  Api:
+    OpenApiVersion: 3.0.3
+    Cors:
+      AllowMethods: "'OPTIONS,POST,GET,PUT,DELETE'"
+      AllowHeaders: "'Content-Type,Authorization,x-amz-security-token,x-amz-date'"
+      AllowOrigin: "'*'"
+
+Resources:
+  AttachmentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-Attachments
+      CodeUri: attachments/
+      Handler: index.handler
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 10
+      Policies:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::170600807185:policy/__S3_Read
+      Environment:
+        Variables:
+          AWS_LAMBDA_LOG_LEVEL: debug
+          UPLOADS_BUCKET: "nikita-yachinshien-image-upload-test"
+      Events:
+        AttachmentsProxy:
+          Type: Api
+          Properties:
+            Path: '/attachments/{proxy+}'
+            Method: any

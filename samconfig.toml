@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "yachin-dev-nikita"
+s3_bucket = "yachin-dev-sam"
+s3_prefix = "dev-nikita"
+region = "ap-northeast-1"
+profile = "yachin"
+capabilities = "CAPABILITY_IAM"
+
